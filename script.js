@@ -2,16 +2,19 @@
    YOUR DETAILS
    Edit these and the whole page updates. Anything still in
    [SQUARE BRACKETS] shows as a yellow highlighted placeholder
-   until it's filled in. Also replace [YOUR NAME] in the <title>
-   and og:title in index.html, so Google and link previews see it.
+   until it's filled in. If your name or town change, also update
+   the <title>, description and og: tags in index.html, which
+   Google and link previews read before this script runs.
    ============================================================ */
 const CONFIG = {
-  name: "[YOUR NAME]",
-  town: "[YOUR TOWN]",                         // e.g. "Dublin"
+  name: "Mervin Ilyaz",
+  firstName: "Mervin",
+  town: "Dublin",
   email: "[YOUR EMAIL]",
   whatsappDisplay: "[YOUR WHATSAPP NUMBER]",   // how it's shown, e.g. "087 123 4567"
   whatsapp: "",                                // digits only with country code, no + or spaces, e.g. "353871234567"
   replyTime: "[REPLY TIME, e.g. within one working day]",
+  photo: "",                                   // e.g. "images/mervin.jpg": a portrait (4:5) photo of you
 
   // FORM BACKEND: paste a Web3Forms access key here (free at web3forms.com, the same
   // service Settle in Ireland uses). While it's empty the form tells visitors to use
@@ -44,6 +47,20 @@ document.querySelectorAll("[data-email]").forEach((a) => {
   if (isPlaceholder(CONFIG.email)) a.removeAttribute("href");
   else a.href = `mailto:${CONFIG.email}`;
 });
+
+/* ---------- photo: set CONFIG.photo and it replaces the placeholder ---------- */
+const photoFig = document.querySelector(".about-photo");
+if (photoFig && CONFIG.photo) {
+  const img = new Image();
+  img.onload = () => {
+    img.alt = CONFIG.name;
+    img.width = img.naturalWidth;
+    img.height = img.naturalHeight;
+    photoFig.replaceChildren(img);
+    photoFig.classList.add("has-img");
+  };
+  img.src = CONFIG.photo;
+}
 
 const year = document.getElementById("year");
 if (year) year.textContent = new Date().getFullYear();
