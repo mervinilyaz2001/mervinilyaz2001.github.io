@@ -16,6 +16,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,500..900&family=Caveat:wght@600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Schibsted+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script>if(!(window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches))document.documentElement.classList.add("motion");</script>
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -38,6 +39,7 @@
 </svg>
 
 <a class="skip-link" href="#main">Skip to content</a>
+<div class="progress" aria-hidden="true"></div>
 
 <header class="site-header" id="top">
   <div class="wrap header-inner">
@@ -107,6 +109,19 @@
     </div>
   </section>
 
+  <!-- ============ MARQUEE ============ -->
+  <div class="marquee">
+    <p class="sr-only">Fewer likes, more calls. Fewer clicks, more customers. Less reach, more booked jobs. Less guesswork, real numbers.</p>
+    <div class="marquee-track" aria-hidden="true">
+      <div class="mq-group">
+        <span class="mq-item"><s>Likes</s>Calls</span>
+        <span class="mq-item"><s>Clicks</s>Customers</span>
+        <span class="mq-item"><s>Reach</s>Booked jobs</span>
+        <span class="mq-item"><s>Guesswork</s>Real numbers</span>
+      </div>
+    </div>
+  </div>
+
   <!-- ============ SPEC STRIP ============ -->
   <section class="specs" aria-labelledby="specsTitle">
     <div class="wrap">
@@ -117,6 +132,17 @@
         <li><strong>125</strong><span>characters Meta recommends for a Facebook ad's main text</span></li>
         <li><strong>1</strong><span>job for every line: get the next line read</span></li>
       </ul>
+      <div class="try">
+        <label class="label" for="tryHeadline">Try it: write a Google headline for your business</label>
+        <div class="try-row">
+          <input type="text" id="tryHeadline" maxlength="60" autocomplete="off" spellcheck="false" placeholder="Emergency Plumber in Swords">
+          <span class="try-count" id="tryCount">0/30</span>
+        </div>
+        <div class="try-out">
+          <p class="try-preview" id="tryPreview" aria-hidden="true"></p>
+          <p class="try-note" id="tryNote" aria-live="polite"></p>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -214,25 +240,31 @@
         <div class="hooklab-head">
           <p class="label">Hook test · JC Heating &amp; Plumbing · <span class="tag tag-concept">Concept</span></p>
           <h3>Same offer. Three ways in.</h3>
-          <p>How I'd test the boiler-service ad. Same budget, same photo, same button. Only the opening line changes.</p>
+          <p>How I'd test the boiler-service ad. Same budget, same photo, same button. Only the opening line changes. Tap a hook to run it.</p>
         </div>
-        <ul class="hooks">
-          <li>
-            <span class="hook-id" aria-hidden="true">A</span>
-            <p class="label">Hook A · The cold night</p>
-            <p class="hook-text">The first cold night is the worst time to find out your boiler isn't working.</p>
-          </li>
-          <li>
-            <span class="hook-id" aria-hidden="true">B</span>
-            <p class="label">Hook B · The calendar</p>
-            <p class="hook-text">Book your boiler service in September and pick any day you like. Leave it until the first frost and take whatever's left.</p>
-          </li>
-          <li>
-            <span class="hook-id" aria-hidden="true">C</span>
-            <p class="label">Hook C · The neighbour</p>
-            <p class="hook-text">Based in Bunclody, servicing oil boilers across Wexford, Kilkenny, Carlow and Wicklow. A fixed price before we start.</p>
-          </li>
-        </ul>
+        <div class="hooklab-body">
+          <div class="hook-preview">
+            <div class="ad ad-feed ad-mini">
+              <div class="ad-head">
+                <span class="ad-avatar" style="background:#B85A1E">JC</span>
+                <div><b>JC Heating &amp; Plumbing</b><span>Sponsored</span></div>
+                <svg class="ic ad-more"><use href="#i-dots"/></svg>
+              </div>
+              <p class="ad-text"><span class="hook-live-wrap"><span id="hookLive">The first cold night is the worst time to find out your boiler isn't working.</span><span class="caret" aria-hidden="true"></span></span>Tap below and pick a day that suits you.</p>
+              <img src="images/ad-jc-boiler.webp" alt="" width="900" height="471" loading="lazy">
+              <div class="ad-cta">
+                <div><span>WhatsApp</span><b>Book your boiler service before winter</b></div>
+                <span class="ad-btn">Send message</span>
+              </div>
+            </div>
+            <p class="label hook-running">Running now: <b id="hookName">Hook A · The cold night</b></p>
+          </div>
+          <ul class="hooks">
+            <li><button type="button" class="hook is-on" aria-pressed="true" data-name="Hook A · The cold night" data-text="The first cold night is the worst time to find out your boiler isn't working."><span class="hook-id" aria-hidden="true">A</span><span class="label">Hook A · The cold night</span><span class="hook-text">The first cold night is the worst time to find out your boiler isn't working.</span><span class="hook-timer" aria-hidden="true"></span></button></li>
+            <li><button type="button" class="hook" aria-pressed="false" data-name="Hook B · The calendar" data-text="Book your boiler service in September and pick any day you like. Leave it until the first frost and take whatever's left."><span class="hook-id" aria-hidden="true">B</span><span class="label">Hook B · The calendar</span><span class="hook-text">Book your boiler service in September and pick any day you like. Leave it until the first frost and take whatever's left.</span><span class="hook-timer" aria-hidden="true"></span></button></li>
+            <li><button type="button" class="hook" aria-pressed="false" data-name="Hook C · The neighbour" data-text="Based in Bunclody, servicing oil boilers across Wexford, Kilkenny, Carlow and Wicklow. A fixed price before we start."><span class="hook-id" aria-hidden="true">C</span><span class="label">Hook C · The neighbour</span><span class="hook-text">Based in Bunclody, servicing oil boilers across Wexford, Kilkenny, Carlow and Wicklow. A fixed price before we start.</span><span class="hook-timer" aria-hidden="true"></span></button></li>
+          </ul>
+        </div>
         <p class="hooklab-foot"><span class="hand">After a week, the winner keeps the budget</span> and I write a new hook to try and beat it.</p>
       </div>
     </div>
@@ -669,6 +701,8 @@
 <a href="#contact" class="wa-float" data-wa="Hi Mervin, I'd like a free ad and copy check. My business is: " aria-label="Message me on WhatsApp">
   <svg class="ic ic-fill"><use href="#i-wa"/></svg><span>WhatsApp</span>
 </a>
+
+<div class="cursor" aria-hidden="true"><span class="cursor-ring"><i></i><b class="cursor-label"></b></span><span class="cursor-dot"><i></i></span></div>
 
 <script src="script.js"></script>
 </body>
