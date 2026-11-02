@@ -75,26 +75,11 @@ const toggle = document.getElementById("navToggle");
 const setNav = (open) => {
   document.body.classList.toggle("nav-open", open);
   toggle.setAttribute("aria-expanded", String(open));
-  toggle.setAttribute("aria-label", open ? "Close menu" : "Open menu");
+  toggle.textContent = open ? "Close" : "Menu";
 };
 toggle.addEventListener("click", () => setNav(!document.body.classList.contains("nav-open")));
 document.querySelectorAll(".main-nav a").forEach((a) => a.addEventListener("click", () => setNav(false)));
 document.addEventListener("keydown", (e) => { if (e.key === "Escape") setNav(false); });
-
-/* ---------- scroll reveals ---------- */
-const revealEls = document.querySelectorAll("[data-reveal]");
-if ("IntersectionObserver" in window) {
-  const io = new IntersectionObserver((entries) => {
-    entries.forEach((entry) => {
-      if (!entry.isIntersecting) return;
-      entry.target.classList.add("is-in");
-      io.unobserve(entry.target);
-    });
-  }, { rootMargin: "0px 0px -8% 0px", threshold: 0.08 });
-  revealEls.forEach((el) => io.observe(el));
-} else {
-  revealEls.forEach((el) => el.classList.add("is-in"));
-}
 
 /* ---------- hide the floating WhatsApp button over the contact section ---------- */
 const waFloat = document.querySelector(".wa-float");
@@ -136,7 +121,7 @@ form.addEventListener("submit", async (e) => {
       headers: { "Content-Type": "application/json", Accept: "application/json" },
       body: JSON.stringify({
         access_key: CONFIG.web3formsKey,
-        subject: `New portfolio enquiry: ${data.business}`,
+        subject: `New enquiry from your website: ${data.business}`,
         from_name: "Portfolio website",
         ...data
       })
