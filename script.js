@@ -8,7 +8,7 @@
    script runs.
    ============================================================ */
 const CONFIG = {
-  brand: "Full Diary",                         // the business name in the header and footer (put your own name here to trade as yourself)
+  brand: "Mervin Ilyaz Digital Marketing",     // the full business name, used in the footer
   name: "Mervin Ilyaz",
   firstName: "Mervin",
   town: "Dublin",
@@ -148,7 +148,7 @@ form.addEventListener("submit", async (e) => {
       body: JSON.stringify({
         access_key: CONFIG.web3formsKey,
         subject: `New enquiry from your website: ${data.business}`,
-        from_name: "Full Diary website",
+        from_name: "Mervin Ilyaz Digital Marketing website",
         ...data
       })
     });
