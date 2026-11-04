@@ -2,11 +2,13 @@
    YOUR DETAILS
    Edit these and the whole page updates. Anything still in
    [SQUARE BRACKETS] shows as a yellow highlighted placeholder
-   until it's filled in. If your name or town change, also update
-   the <title>, description and og: tags in index.html, which
-   Google and link previews read before this script runs.
+   until it's filled in. If the business name, your name or town
+   change, also update the <title>, description and og: tags in
+   index.html, which Google and link previews read before this
+   script runs.
    ============================================================ */
 const CONFIG = {
+  brand: "Full Diary",                         // the business name in the header and footer (put your own name here to trade as yourself)
   name: "Mervin Ilyaz",
   firstName: "Mervin",
   town: "Dublin",
@@ -146,7 +148,7 @@ form.addEventListener("submit", async (e) => {
       body: JSON.stringify({
         access_key: CONFIG.web3formsKey,
         subject: `New enquiry from your website: ${data.business}`,
-        from_name: "Portfolio website",
+        from_name: "Full Diary website",
         ...data
       })
     });

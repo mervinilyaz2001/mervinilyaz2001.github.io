@@ -114,8 +114,9 @@ ul,ol,dl,dd{ margin:0; padding:0; list-style:none; }
 .header-inner{ height: var(--header-h); display:flex; align-items:center; justify-content:space-between; gap:20px; }
 .brand{ display:flex; align-items:center; gap:10px; text-decoration:none; min-width:0; }
 .brand-name{ font: 850 1.65rem/1 var(--f-display); font-stretch: 62%; text-transform:uppercase; white-space:nowrap; }
+.brand-name::after{ content:"."; color: var(--pen); }
 .brand-tag{ font: 700 1.3rem/1 var(--f-hand); color: var(--pen); white-space:nowrap; display:inline-block; transform: rotate(-4deg) translateY(2px); }
-@media (max-width: 379px){ .brand-tag{ display:none; } }
+@media (max-width: 339px){ .brand-tag{ display:none; } }
 
 .main-nav{ display:flex; align-items:center; gap: 26px; }
 .main-nav a:not(.btn){
