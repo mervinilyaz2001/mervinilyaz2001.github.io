@@ -148,6 +148,7 @@ form.addEventListener("input", (e) => {
 
 /* ============================================================
    MOTION & INTERACTION
+   Scroll-driven only: nothing follows the mouse or a finger.
    Each feature runs on its own, so one failing never breaks the
    rest. With reduced motion switched on, the moving parts are skipped.
    ============================================================ */
@@ -155,7 +156,6 @@ form.addEventListener("input", (e) => {
   const root = document.documentElement;
   const matches = (q) => !!(window.matchMedia && window.matchMedia(q).matches);
   const reduced = matches("(prefers-reduced-motion: reduce)");
-  const fine = matches("(hover: hover) and (pointer: fine)");
   const hasIO = "IntersectionObserver" in window;
   if (reduced || !hasIO) root.classList.remove("motion");
   const motion = root.classList.contains("motion");
@@ -232,45 +232,6 @@ form.addEventListener("input", (e) => {
     if (steps) steps.dataset.live = "";
   });
 
-  /* 2. hero: point at (or drag a finger over) the headline to highlight it */
-  feature("hero", () => {
-    const h1 = $(".hero h1");
-    if (!h1) return;
-    const words = [];
-    $$(".h1-line", h1).forEach((line) => splitWords(line, () => {
-      const s = document.createElement("span"); s.className = "hw"; words.push(s);
-      return { outer: s, inner: s };
-    }));
-    const lite = (w) => {
-      if (!w) return;
-      w.classList.add("lit");
-      clearTimeout(w._t);
-      w._t = setTimeout(() => w.classList.remove("lit"), 1400);
-    };
-    words.forEach((w) => w.addEventListener("pointerenter", () => lite(w)));
-    h1.addEventListener("touchmove", (e) => {
-      const t = e.touches[0];
-      const el = t && document.elementFromPoint(t.clientX, t.clientY);
-      lite(el && el.closest(".hw"));
-    }, { passive: true });
-    // one sweep across the headline after it lands, as a hint that it reacts
-    if (motion) setTimeout(() => words.forEach((w, i) => setTimeout(() => lite(w), i * 70)), 2300);
-
-    if (!fine || reduced) return;
-    const hero = $(".hero"), lines = $$(".h1-line", h1), note = $(".hero-note");
-    hero.addEventListener("pointermove", (e) => {
-      if (e.pointerType !== "mouse") return;
-      const nx = e.clientX / window.innerWidth - 0.5;
-      const ny = e.clientY / window.innerHeight - 0.5;
-      lines.forEach((l, i) => { l.style.translate = (-nx * (8 + i * 7)).toFixed(1) + "px " + (-ny * (4 + i * 3)).toFixed(1) + "px"; });
-      if (note) note.style.translate = (-nx * 30).toFixed(1) + "px " + (-ny * 14).toFixed(1) + "px";
-    });
-    hero.addEventListener("pointerleave", () => {
-      lines.forEach((l) => { l.style.translate = ""; });
-      if (note) note.style.translate = "";
-    });
-  });
-
   /* 3. scroll-linked: progress line, header, marquee, drifting headings, process line */
   feature("scroll", () => {
     const progress = $(".progress");
@@ -280,7 +241,8 @@ form.addEventListener("input", (e) => {
     const stepItems = steps ? $$("li", steps) : [];
     const track = $(".marquee-track");
     const group = track && $(".mq-group", track);
-    let mqW = 0, mqX = 0, mqDir = -1, boost = 0;
+    let mqW = 0, mqX = 0, mqDir = -1, boost = 0, mqOnScreen = true;
+    if (track && hasIO) new IntersectionObserver(([e]) => { mqOnScreen = e.isIntersecting; }).observe(track);
     const measure = () => {
       if (!track || !group) return;
       $$(".mq-group", track).slice(1).forEach((g) => g.remove());
@@ -303,7 +265,7 @@ form.addEventListener("input", (e) => {
       lastY = y;
 
       // the strip drifts on its own and speeds up with your scrolling, in the same direction
-      if (track && mqW && !reduced) {
+      if (track && mqW && mqOnScreen && !reduced) {
         if (dy) mqDir = dy > 0 ? -1 : 1;
         boost += (Math.min(Math.abs(dy) / dt, 4000) - boost) * 0.08;
         mqX += (55 + boost * 0.3) * dt * mqDir;
@@ -338,107 +300,7 @@ form.addEventListener("input", (e) => {
     requestAnimationFrame(frame);
   });
 
-  /* 4. custom cursor (mouse only) */
-  feature("cursor", () => {
-    if (!fine || reduced) return;
-    const cur = $(".cursor");
-    if (!cur) return;
-    const dot = $(".cursor-dot", cur), ring = $(".cursor-ring", cur), label = $(".cursor-label", cur);
-    $$(".job-shot").forEach((el) => { el.dataset.cursor = "Open ↗"; });
-    $$(".ad").forEach((el) => { el.dataset.cursor = el.closest(".hook-preview") ? "Live" : "Concept"; });
-    $$(".hook").forEach((el) => { el.dataset.cursor = "Run it"; });
-    $$(".breakdown-shot").forEach((el) => { el.dataset.cursor = "Roofit"; });
-    root.classList.add("has-cursor");
-    let mx = -100, my = -100, rx = -100, ry = -100, shown = false;
-    window.addEventListener("pointermove", (e) => {
-      if (e.pointerType !== "mouse") return;
-      mx = e.clientX; my = e.clientY;
-      if (!shown) { rx = mx; ry = my; shown = true; cur.classList.add("on"); }
-      dot.style.transform = "translate3d(" + mx + "px," + my + "px,0)";
-    }, { passive: true });
-    root.addEventListener("mouseleave", () => { shown = false; cur.classList.remove("on"); });
-    const loop = () => {
-      rx += (mx - rx) * 0.2; ry += (my - ry) * 0.2;
-      ring.style.transform = "translate3d(" + rx.toFixed(1) + "px," + ry.toFixed(1) + "px,0)";
-      requestAnimationFrame(loop);
-    };
-    requestAnimationFrame(loop);
-    document.addEventListener("pointerover", (e) => {
-      const t = e.target;
-      if (!t || !t.closest) return;
-      const lab = t.closest("[data-cursor]");
-      cur.classList.toggle("is-text", !!t.closest("input, textarea"));
-      cur.classList.toggle("has-label", !!lab);
-      cur.classList.toggle("is-hot", !lab && !!t.closest("a, button, summary, .pills label"));
-      label.textContent = lab ? lab.dataset.cursor : "";
-    });
-    document.addEventListener("pointerdown", () => cur.classList.add("is-down"));
-    document.addEventListener("pointerup", () => cur.classList.remove("is-down"));
-  });
-
-  /* 5. ads and cards tilt under the mouse or a finger */
-  feature("tilt", () => {
-    if (reduced) return;
-    $$(".ad, .breakdown-shot, .rewrite").forEach((el) => {
-      el.setAttribute("data-tilt", "");
-      const set = (x, y) => {
-        const r = el.getBoundingClientRect();
-        const px = clamp((x - r.left) / r.width, 0, 1) - 0.5;
-        const py = clamp((y - r.top) / r.height, 0, 1) - 0.5;
-        el.style.setProperty("--ry", (px * 10).toFixed(2) + "deg");
-        el.style.setProperty("--rx", (-py * 8).toFixed(2) + "deg");
-        el.classList.add("tilting");
-      };
-      const reset = () => {
-        el.style.setProperty("--rx", "0deg");
-        el.style.setProperty("--ry", "0deg");
-        el.classList.remove("tilting");
-      };
-      el.addEventListener("pointermove", (e) => { if (e.pointerType === "mouse") set(e.clientX, e.clientY); });
-      el.addEventListener("pointerleave", reset);
-      el.addEventListener("touchmove", (e) => { const t = e.touches[0]; if (t) set(t.clientX, t.clientY); }, { passive: true });
-      el.addEventListener("touchend", reset);
-      el.addEventListener("touchcancel", reset);
-    });
-  });
-
-  /* 6. buttons lean towards the mouse */
-  feature("magnet", () => {
-    if (!fine || reduced) return;
-    $$(".btn").forEach((b) => {
-      b.addEventListener("pointermove", (e) => {
-        const r = b.getBoundingClientRect();
-        b.style.setProperty("--mx", ((e.clientX - (r.left + r.width / 2)) * 0.18).toFixed(1) + "px");
-        b.style.setProperty("--my", ((e.clientY - (r.top + r.height / 2)) * 0.3).toFixed(1) + "px");
-      });
-      b.addEventListener("pointerleave", () => {
-        b.style.setProperty("--mx", "0px");
-        b.style.setProperty("--my", "0px");
-      });
-    });
-  });
-
-  /* 7. a red-pen circle wherever you press */
-  feature("tap", () => {
-    if (reduced) return;
-    let last = 0;
-    document.addEventListener("pointerdown", (e) => {
-      const now = performance.now();
-      if (now - last < 90) return;
-      last = now;
-      if (e.target && e.target.closest && e.target.closest("input, textarea, select")) return;
-      const m = document.createElement("span");
-      m.className = "tap";
-      m.setAttribute("aria-hidden", "true");
-      m.style.left = e.clientX + "px";
-      m.style.top = e.clientY + "px";
-      m.style.rotate = Math.round(Math.random() * 60 - 30) + "deg";
-      document.body.append(m);
-      setTimeout(() => m.remove(), 700);
-    }, { passive: true });
-  });
-
-  /* 8. hook test: tap or hover a hook and it types itself into the ad */
+  /* 8. hook test: tap a hook and it types itself into the ad */
   feature("hooks", () => {
     const btns = $$(".hook"), live = $("#hookLive"), name = $("#hookName"), lab = $(".hooklab");
     if (!btns.length || !live || !name || !lab) return;
@@ -473,10 +335,7 @@ form.addEventListener("input", (e) => {
       }
       schedule();
     };
-    btns.forEach((b, i) => {
-      b.addEventListener("click", () => set(i, true));
-      b.addEventListener("pointerenter", (e) => { if (e.pointerType === "mouse" && i !== idx) set(i, true); });
-    });
+    btns.forEach((b, i) => b.addEventListener("click", () => set(i, true)));
     if (hasIO) new IntersectionObserver(([e]) => { visible = e.isIntersecting; schedule(); }, { threshold: 0.35 }).observe(lab);
   });
 
