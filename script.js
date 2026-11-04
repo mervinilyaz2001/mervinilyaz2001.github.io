@@ -43,6 +43,17 @@ document.querySelectorAll("[data-wa]").forEach((a) => {
   if (CONFIG.whatsapp) { a.target = "_blank"; a.rel = "noopener"; }
 });
 
+// extra WhatsApp buttons only appear once a real number is set above
+if (!CONFIG.whatsapp) document.querySelectorAll(".wa-only").forEach((el) => { el.hidden = true; });
+
+// buttons around the page tick the matching option in the form
+document.querySelectorAll("[data-need]").forEach((a) => a.addEventListener("click", () => {
+  const option = document.getElementById(a.dataset.need);
+  if (option) option.checked = true;
+  const formEl = document.getElementById("contactForm");
+  if (formEl) { formEl.classList.remove("flash"); void formEl.offsetWidth; formEl.classList.add("flash"); }
+}));
+
 document.querySelectorAll("[data-email]").forEach((a) => {
   if (isPlaceholder(CONFIG.email)) a.removeAttribute("href");
   else a.href = `mailto:${CONFIG.email}`;
@@ -81,19 +92,26 @@ toggle.addEventListener("click", () => setNav(!document.body.classList.contains(
 document.querySelectorAll(".main-nav a").forEach((a) => a.addEventListener("click", () => setNav(false)));
 document.addEventListener("keydown", (e) => { if (e.key === "Escape") setNav(false); });
 
-/* ---------- floating WhatsApp tab: hidden at the very top and over the contact section ---------- */
-const waFloat = document.querySelector(".wa-float");
-const contact = document.getElementById("contact");
-let overContact = false;
-let nearTop = true;
-const syncWa = () => { if (waFloat) waFloat.classList.toggle("hide", overContact || nearTop); };
-if (waFloat && contact && "IntersectionObserver" in window) {
-  new IntersectionObserver(([entry]) => { overContact = entry.isIntersecting; syncWa(); }, { threshold: 0.15 })
-    .observe(contact);
-}
-const checkTop = () => { nearTop = window.scrollY < 360; syncWa(); };
-checkTop();
-window.addEventListener("scroll", checkTop, { passive: true });
+/* ---------- sticky call to action: shows once you're past the hero buttons, hides at the form ---------- */
+const dock = document.getElementById("dock");
+const heroCtas = document.querySelector(".hero-ctas");
+const endZone = [document.getElementById("contact"), document.querySelector(".site-footer")];
+let beforeHeroCtas = true;
+const atEnd = new Set();
+const syncDock = () => { if (dock) dock.classList.toggle("hide", beforeHeroCtas || atEnd.size > 0); };
+if (dock && "IntersectionObserver" in window) {
+  if (heroCtas) {
+    new IntersectionObserver(([entry]) => {
+      beforeHeroCtas = entry.isIntersecting || entry.boundingClientRect.top > 0;
+      syncDock();
+    }).observe(heroCtas);
+  } else beforeHeroCtas = false;
+  const endIO = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => { if (entry.isIntersecting) atEnd.add(entry.target); else atEnd.delete(entry.target); });
+    syncDock();
+  }, { threshold: 0.05 });
+  endZone.forEach((el) => { if (el) endIO.observe(el); });
+} else if (dock) dock.classList.remove("hide");
 
 /* ---------- contact form ---------- */
 const form = document.getElementById("contactForm");
@@ -195,7 +213,7 @@ form.addEventListener("input", (e) => {
   feature("reveal", () => {
     if (!motion) return;
     const groups = [
-      [".kicker, .section-intro, .sub-head, .familiar-group, .spec-list li, .try, .ad-wrap, .rewrite, .notes li, .core-item, .extras li, .job, .steps li, .promises li, .faq details, .skill-list li, .story div", "up"],
+      [".kicker, .section-intro, .sub-head, .familiar-group, .familiar-cta, .cta-strip, .faq-cta, .about-ctas, .spec-list li, .try, .ad-wrap, .rewrite, .notes li, .core-item, .extras li, .job, .steps li, .promises li, .faq details, .skill-list li, .story div", "up"],
       [".hooklab, .breakdown-shot, .about-photo", "scale"],
       [".contact-form", "right"]
     ];
