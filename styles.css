@@ -413,7 +413,7 @@ ul,ol,dl,dd{ margin:0; padding:0; list-style:none; }
 /* ---------- services ---------- */
 .core{ display:grid; border-top: 2px solid var(--on-ink); }
 @media (min-width: 1000px){ .core{ grid-template-columns: repeat(3, minmax(0,1fr)); } }
-.core-item{ display:grid; gap: 18px; align-content:start; padding-block: clamp(28px, 4vw, 44px); }
+.core-item{ display:grid; grid-template-columns: minmax(0, 1fr); gap: 18px; align-content:start; min-width:0; padding-block: clamp(28px, 4vw, 44px); container-type: inline-size; }
 .core-item + .core-item{ border-top: 1px solid var(--ink-hair); }
 @media (min-width: 1000px){
   .core-item{ padding-inline: 32px; }
@@ -421,7 +421,8 @@ ul,ol,dl,dd{ margin:0; padding:0; list-style:none; }
   .core-item:last-child{ padding-right: 0; }
   .core-item + .core-item{ border-top: 0; border-left: 1px solid var(--ink-hair); }
 }
-.core-item h3{ font-size: clamp(3.8rem, 6.2vw, 6.2rem); font-stretch: 62%; font-weight: 850; text-transform: uppercase; line-height: .82; }
+/* sized to the column, not the window, so the word never crosses the divider */
+.core-item h3{ font-size: clamp(3.4rem, 6vw, 5.4rem); font-size: clamp(3.4rem, 23cqi, 6.2rem); font-stretch: 62%; font-weight: 850; text-transform: uppercase; line-height: .82; }
 .core-item h3::after{ content:"."; color: var(--pen-hi); }
 .core-item > p{ color: var(--on-ink-2); font-size: 1.08rem; max-width: 46ch; }
 .core-item ul{ display:grid; border-top: 1px solid var(--ink-hair); }
