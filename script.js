@@ -94,10 +94,12 @@ toggle.addEventListener("click", () => setNav(!document.body.classList.contains(
 document.querySelectorAll(".main-nav a").forEach((a) => a.addEventListener("click", () => setNav(false)));
 document.addEventListener("keydown", (e) => { if (e.key === "Escape") setNav(false); });
 
-/* ---------- sticky call to action: shows once you're past the hero buttons, hides at the form ---------- */
+/* ---------- sticky call to action: shows once you're past the hero buttons; hides at the form
+   and while one of the page's own call-to-action blocks is on screen ---------- */
 const dock = document.getElementById("dock");
 const heroCtas = document.querySelector(".hero-ctas");
-const endZone = [document.getElementById("contact"), document.querySelector(".site-footer")];
+const endZone = [document.getElementById("contact"), document.querySelector(".site-footer"),
+  ...document.querySelectorAll(".cta-strip, .discovery-foot, .about-ctas")];
 let beforeHeroCtas = true;
 const atEnd = new Set();
 const syncDock = () => { if (dock) dock.classList.toggle("hide", beforeHeroCtas || atEnd.size > 0); };
@@ -215,7 +217,7 @@ form.addEventListener("input", (e) => {
   feature("reveal", () => {
     if (!motion) return;
     const groups = [
-      [".kicker, .section-intro, .sub-head, .familiar-group, .familiar-cta, .cta-strip, .faq-cta, .about-ctas, .spec-list li, .try, .ad-wrap, .rewrite, .notes li, .core-item, .extras li, .job, .steps li, .promises li, .faq details, .skill-list li, .story div", "up"],
+      [".kicker, .section-intro, .sub-head, .picks li, .discovery-foot, .familiar-group, .familiar-cta, .cta-strip, .faq-cta, .about-ctas, .spec-list li, .try, .ad-wrap, .rewrite, .notes li, .core-item, .extras li, .job, .steps li, .promises li, .faq details, .skill-list li, .story div", "up"],
       [".hooklab, .breakdown-shot, .about-photo", "scale"],
       [".contact-form", "right"]
     ];
@@ -252,11 +254,10 @@ form.addEventListener("input", (e) => {
     if (steps) steps.dataset.live = "";
   });
 
-  /* 3. scroll-linked: progress line, header, marquee, drifting headings, process line */
+  /* 3. scroll-linked: progress line, header, marquee, process line */
   feature("scroll", () => {
     const progress = $(".progress");
     const headerEl = $(".site-header");
-    const drifts = motion ? $$(".section-head h2") : [];
     const steps = motion ? $(".steps") : null;
     const stepItems = steps ? $$("li", steps) : [];
     const track = $(".marquee-track");
@@ -302,12 +303,6 @@ form.addEventListener("input", (e) => {
           else if (dy < -2 || y < 160) hidden = false;
           headerEl.classList.toggle("is-hidden", hidden);
         }
-        drifts.forEach((h) => {
-          const r = h.getBoundingClientRect();
-          if (r.bottom < -120 || r.top > window.innerHeight + 120) return;
-          const p = (r.top + r.height / 2) / window.innerHeight - 0.5;
-          h.style.translate = (-p * 56).toFixed(1) + "px 0";
-        });
         if (steps) {
           const r = steps.getBoundingClientRect();
           const p = clamp((window.innerHeight * 0.85 - r.top) / (r.height + window.innerHeight * 0.25), 0, 1);

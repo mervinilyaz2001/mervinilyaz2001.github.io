@@ -470,6 +470,21 @@ ul,ol,dl,dd{ margin:0; padding:0; list-style:none; }
 .story dd{ color: var(--ink-2); font-size: 1rem; max-width: 60ch; }
 .story strong{ color: var(--ink); }
 
+/* ---------- free discovery project ---------- */
+.section-marker{ background: var(--marker); }
+.section-marker .kicker{ color: var(--ink); }
+.section-marker .section-intro{ color: var(--ink); }
+.picks-label{ margin-bottom: 14px; }
+.picks{ display:grid; gap: 18px; }
+@media (min-width: 640px){ .picks{ grid-template-columns: repeat(2, minmax(0,1fr)); } }
+@media (min-width: 1100px){ .picks{ grid-template-columns: repeat(4, minmax(0,1fr)); } }
+.picks li{ display:grid; gap: 10px; align-content:start; min-width:0; background: var(--paper); border: var(--rule); box-shadow: 6px 6px 0 var(--ink); padding: clamp(20px, 2.4vw, 28px); }
+.picks .tag{ color: var(--pen); }
+.picks h3{ font-size: 1.45rem; }
+.picks p{ color: var(--ink-2); font-size: 1rem; }
+.discovery-foot{ display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap: 18px 32px; margin-top: clamp(36px, 4vw, 52px); padding-top: 24px; border-top: var(--rule); }
+.discovery-foot > p{ max-width: 56ch; color: var(--ink); }
+
 /* ---------- about ---------- */
 .about-grid{ display:grid; gap: 40px; align-items:center; }
 @media (min-width: 900px){ .about-grid{ grid-template-columns: minmax(0,.8fr) minmax(0,1.2fr); gap: 72px; } }
