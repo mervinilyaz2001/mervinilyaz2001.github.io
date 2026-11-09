@@ -94,6 +94,24 @@ toggle.addEventListener("click", () => setNav(!document.body.classList.contains(
 document.querySelectorAll(".main-nav a").forEach((a) => a.addEventListener("click", () => setNav(false)));
 document.addEventListener("keydown", (e) => { if (e.key === "Escape") setNav(false); });
 
+/* ---------- back to the top: clicking the name, and every reload ---------- */
+const prefersReduced = !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+const clearHash = () => { if (location.hash) history.replaceState(null, "", location.pathname + location.search); };
+const brandLink = document.querySelector(".brand");
+if (brandLink) brandLink.addEventListener("click", (e) => {
+  e.preventDefault();
+  setNav(false);
+  window.scrollTo({ top: 0, behavior: prefersReduced ? "instant" : "smooth" });
+  clearHash();
+});
+try {
+  const navEntry = performance.getEntriesByType("navigation")[0];
+  if (navEntry && navEntry.type === "reload") {
+    window.scrollTo({ top: 0, behavior: "instant" });
+    window.addEventListener("load", () => window.scrollTo({ top: 0, behavior: "instant" }));
+  }
+} catch (err) { /* older browsers: the normal reload behaviour applies */ }
+
 /* ---------- sticky call to action: shows once you're past the hero buttons; hides at the form
    and while one of the page's own call-to-action blocks is on screen ---------- */
 const dock = document.getElementById("dock");
