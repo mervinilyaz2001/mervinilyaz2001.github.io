@@ -18,10 +18,10 @@ const CONFIG = {
   replyTime: "as soon as possible",
   photo: "images/mervin.webp",                 // a portrait (4:5) photo of you
 
-  // FORM BACKEND: paste a Web3Forms access key here (free at web3forms.com, the same
-  // service Settle in Ireland uses). While it's empty the form tells visitors to use
-  // WhatsApp or email instead, so no enquiry is silently lost.
-  web3formsKey: ""
+  // FORM BACKEND: Web3Forms access key (web3forms.com). Enquiries go to mervinilyaz@outlook.com.
+  // The key is meant to be public: it only lets people send messages to that inbox.
+  // If it's ever emptied, the form tells visitors to use WhatsApp or email instead.
+  web3formsKey: "a2af6af5-c2ba-4b7e-a972-606921bb0125"
 };
 
 const isPlaceholder = (v) => !v || /^\[.*\]$/.test(String(v).trim());
@@ -169,7 +169,9 @@ form.addEventListener("submit", async (e) => {
         access_key: CONFIG.web3formsKey,
         subject: `New enquiry from your website: ${data.business}`,
         from_name: "Mervin Ilyaz Digital Marketing website",
-        ...data
+        ...data,
+        // if they left an email address, "Reply" in your inbox goes straight to them
+        ...(/^\S+@\S+\.\S+$/.test((data.contact || "").trim()) ? { replyto: data.contact.trim() } : {})
       })
     });
     const json = await res.json();
