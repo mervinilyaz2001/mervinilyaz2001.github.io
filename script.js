@@ -217,7 +217,7 @@ form.addEventListener("input", (e) => {
   feature("reveal", () => {
     if (!motion) return;
     const groups = [
-      [".kicker, .section-intro, .sub-head, .picks li, .discovery-foot, .familiar-group, .familiar-cta, .cta-strip, .faq-cta, .about-ctas, .spec-list li, .try, .ad-wrap, .rewrite, .notes li, .core-item, .extras li, .job, .steps li, .promises li, .faq details, .skill-list li, .story div", "up"],
+      [".kicker, .section-intro, .sub-head, .picks li, .discovery-foot, .familiar-group, .familiar-cta, .cta-strip, .faq-cta, .about-ctas, .ad-wrap, .rewrite, .notes li, .core-item, .extras li, .job, .steps li, .promises li, .faq details, .skill-list li, .story div", "up"],
       [".hooklab, .breakdown-shot, .about-photo", "scale"],
       [".contact-form", "right"]
     ];
@@ -354,70 +354,6 @@ form.addEventListener("input", (e) => {
     if (hasIO) new IntersectionObserver(([e]) => { visible = e.isIntersecting; schedule(); }, { threshold: 0.35 }).observe(lab);
   });
 
-  /* 9. the character limits count up */
-  feature("count", () => {
-    if (!motion) return;
-    const nums = $$(".spec-list strong");
-    nums.forEach((n) => {
-      const value = n.textContent.trim();
-      const sr = document.createElement("span");
-      sr.className = "sr-only";
-      sr.textContent = value + " ";
-      n.before(sr);
-      n.setAttribute("aria-hidden", "true");
-      n.dataset.n = value;
-      n.textContent = "0";
-    });
-    const io = new IntersectionObserver((entries) => entries.forEach((e) => {
-      if (!e.isIntersecting) return;
-      io.unobserve(e.target);
-      const el = e.target, target = Number(el.dataset.n), start = performance.now(), dur = 1200;
-      const step = (t) => {
-        const p = clamp((t - start) / dur, 0, 1);
-        el.textContent = String(Math.round(target * (1 - Math.pow(1 - p, 3))));
-        if (p < 1) requestAnimationFrame(step);
-      };
-      requestAnimationFrame(step);
-    }), { threshold: 0.6 });
-    nums.forEach((n) => io.observe(n));
-  });
-
-  /* 10. Google headline tester */
-  feature("try", () => {
-    const input = $("#tryHeadline"), count = $("#tryCount"), prev = $("#tryPreview"), note = $("#tryNote");
-    if (!input || !count || !prev || !note) return;
-    const LIMIT = 30;
-    let lastMsg = null;
-    const render = () => {
-      const chars = Array.from(input.value);
-      const n = chars.length;
-      count.textContent = n + "/" + LIMIT;
-      count.classList.toggle("over", n > LIMIT);
-      const shown = n ? chars : Array.from(input.placeholder);
-      prev.replaceChildren(document.createTextNode(shown.slice(0, LIMIT).join("")));
-      if (shown.length > LIMIT) {
-        const s = document.createElement("s");
-        s.textContent = shown.slice(LIMIT).join("");
-        prev.append(s);
-      }
-      prev.classList.toggle("is-sample", !n);
-      const over = n - LIMIT;
-      const msg = !n ? ""
-        : over > 0 ? over + (over === 1 ? " character" : " characters") + " too long. Google won't accept it."
-        : n >= 26 ? "Fits. Only just."
-        : "Fits. Now make every word earn its place.";
-      if (msg !== lastMsg) {
-        lastMsg = msg;
-        note.textContent = msg;
-        note.classList.remove("pop");
-        void note.offsetWidth;
-        if (msg && !reduced) note.classList.add("pop");
-      }
-    };
-    input.addEventListener("input", render);
-    render();
-  });
-
   /* 11. work rows light up as they pass the middle of the screen */
   feature("jobs", () => {
     if (!hasIO) return;
@@ -433,7 +369,9 @@ form.addEventListener("input", (e) => {
     const clear = () => links.forEach((l) => l.classList.remove("is-active"));
     const io = new IntersectionObserver((entries) => entries.forEach((e) => {
       const a = links.get(e.target.id);
-      if (a && e.isIntersecting) { clear(); a.classList.add("is-active"); }
+      if (!a) return;
+      if (e.isIntersecting) { clear(); a.classList.add("is-active"); }
+      else a.classList.remove("is-active");   // left the middle of the screen: stop highlighting it
     }), { rootMargin: "-45% 0px -50% 0px", threshold: 0 });
     links.forEach((a, id) => { const s = document.getElementById(id); if (s) io.observe(s); });
     window.addEventListener("scroll", () => { if (window.scrollY < 300) clear(); }, { passive: true });
