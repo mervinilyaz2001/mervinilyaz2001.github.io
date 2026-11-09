@@ -16,7 +16,7 @@ const CONFIG = {
   whatsappDisplay: "+353 85 130 7006",         // how it's shown on the page
   whatsapp: "353851307006",                    // digits only with country code, no + or spaces
   replyTime: "as soon as possible",
-  photo: "",                                   // e.g. "images/mervin.jpg": a portrait (4:5) photo of you
+  photo: "images/mervin.webp",                 // a portrait (4:5) photo of you
 
   // FORM BACKEND: paste a Web3Forms access key here (free at web3forms.com, the same
   // service Settle in Ireland uses). While it's empty the form tells visitors to use
